@@ -5,14 +5,10 @@ Simulations were conducted in R and Python on the longleaf High Performance Comp
 Before beginning, users need to create a python virtual environment, ensure that the needed R packages are installed, and create a directory structure according to the following 4 steps. 
 
 Step 1: create python virtual environment by running the following commands:
+
 module add anaconda/2023.03
-
-# create the virtual environment in user-specified directory 
 python3 -m venv [user directory]/virtualEnv/bin/activate
-
 module add r/4.2.2
-
-# install the needed python packages, directory should match the one specified above.
 source [user directory]/virtualEnv/bin/activate
 
 python3.10 -m pip install --upgrade pip
@@ -31,7 +27,7 @@ source /nas/longleaf/home/demjus01/virtualEnv/bin/activate
 to 
 source [user directory]/virtualEnv/bin/activate
 
-## Step 4: create directory structure for simulation results.
+Step 4: create directory structure for simulation results.
 The R scripts create output for each replication of the simulation.  The output is stored in a series of subdirectories below the directory which contains all the scripts.  Please create the following (empty) directory structure:
 
 [user directory]/sims/results/spline/scenario1/results
