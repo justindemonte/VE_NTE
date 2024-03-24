@@ -53,7 +53,7 @@ There are three R scripts and one Python script for running the simulations.
 
 ```simGenerate.R``` generates a simulated dataset according to the data generating process described in the manuscript. 
 
-```simEstVE_xxxx.R``` calculates point estimates for the simulated dataset created by simGenerate.R and generates output files.  There are two versions of this script: one for the simulations appearing in the main text of the manuscript ('poly') and one for the simulations appearing in the supplemental materials ('spline').
+```simEstVE_xxxx.R``` calculates point estimates for the simulated dataset created by ```simGenerate.R``` and generates output files.  There are two versions of this script: one for the simulations appearing in the main text of the manuscript ('poly') and one for the simulations appearing in the supplemental materials ('spline').
 
 ```simEstVar_xxxx.py``` calculates variance estimates.  Similarly to ```simEstVE_xxxx.R```, there are two versions: 'poly' and 'spline'. 
 
