@@ -1,6 +1,6 @@
 This repository contains scripts for the simulation study and data analysis in the manuscript "Assessing COVID-19 vaccine effectiveness in observational studies via nested trial emulation" by DeMonte et al.
 
-Simulations were conducted in R and Python on the longleaf High Performance Computing Cluster at UNC-Chapel Hill.  The shell scripts in this repository are used to specify global parameters and submit jobs to the Slurm Workload Manager.  To replicate the simulations, all files under 'sims', including shell scripts, R and Python scripts, should be placed in the same directory.  The following instructions assume that this directory is ```[user directory]/sims/```.
+Simulations were conducted in R and Python on the longleaf High Performance Computing Cluster at UNC-Chapel Hill.  The shell scripts in this repository are used to specify global parameters and submit jobs to the Slurm Workload Manager.  To replicate the simulations, all files under ```sims```, including shell scripts, R and Python scripts, should be placed in the same directory.  The following instructions assume that this directory is ```[user directory]/sims/```.
 
 Before beginning, users need to create a python virtual environment, ensure that the needed R packages are installed, and create a directory structure according to the following 4 steps. 
 
