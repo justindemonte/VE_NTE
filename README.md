@@ -55,9 +55,9 @@ There are three R scripts and one Python script for running the simulations.
 
 ```simEstVE_xxxx.R``` calculates point estimates for the simulated dataset created by simGenerate.R and generates output files.  There are two versions of this script: one for the simulations appearing in the main text of the manuscript ('poly') and one for the simulations appearing in the supplemental materials ('spline').
 
-```simEstVar_xxxx.py``` calculates variance estimates.  Similarly to simEstVE_xxxx.R, there are two versions: 'poly' and 'spline'. 
+```simEstVar_xxxx.py``` calculates variance estimates.  Similarly to ```simEstVE_xxxx.R```, there are two versions: 'poly' and 'spline'. 
 
-To replicate the simulations, the user calls the script 'simRun.sh'.  Once all simulations are completed, running the script 'simGather.R' will generate LaTeX format tables of the results which appear in the manuscript (main text and supplement).
+To replicate the simulations, the user calls the script ```simRun.sh```.  Once all simulations are completed, running the script 'simGather.R' will generate LaTeX format tables of the results which appear in the manuscript (main text and supplement).
 	
 The script ```LexisDiagram/LexisDiagram.R``` generates Figure 1 in the manuscript.  This small script can be run on any R setup assuming that the necessary packages (```tidyverse``` and ```patchwork```) are installed.  Scripts used to analyze the Abruzzo data are contained in ```VEapplication```.  The analysis was carried out using R and Python on the longleaf High Performance Computing Cluster at UNC-Chapel Hill.  These scripts depend on the Abruzzo COVID-19 dataset, which is the property of Dr. Lamberto Manzoli and colleagues and was used under Dr. Manzoli's written permission.  
 
