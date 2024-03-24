@@ -19,8 +19,10 @@ python3.10 -m pip install --upgrade 'pandas'
 
 Step 2: ensure necessary R packages are installed.
 This can be done via an interactive R prompt using ```install.packages()```.  The following packages are required:
+
 ```simEstVE_xxxx.R``` requires the packages ```rms, dplyr, tibble, tidyr, purrr,``` and ```reticulate```.
-simGather.R requires the package ```tidyverse```.
+
+```simGather.R``` requires the package ```tidyverse```.
 
 Step 3: edit shell scripts (where applicable).
 If the following line appears near the top of the shell script, change the directory to match the one specified in Step 1:
