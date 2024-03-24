@@ -6,6 +6,7 @@ Before beginning, users need to create a python virtual environment, ensure that
 
 Step 1: create python virtual environment by running the following commands:
 
+```
 module add anaconda/2023.03
 python3 -m venv [user directory]/virtualEnv/bin/activate
 module add r/4.2.2
@@ -14,6 +15,7 @@ source [user directory]/virtualEnv/bin/activate
 python3.10 -m pip install --upgrade pip
 python3.10 -m pip install --upgrade 'delicatessen'
 python3.10 -m pip install --upgrade 'pandas'
+```
 
 Step 2: ensure necessary R packages are installed.
 This can be done via an interactive R prompt using install.packages().  The following packages are required:
