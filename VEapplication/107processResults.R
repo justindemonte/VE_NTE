@@ -1,7 +1,13 @@
-# Justin DeMonte  
-# 240305
+# 107processResults.R
 #
 # display results of data analysis
+#
+# This program requires some manual actions from the user.
+# First, need to specify a value for the variable `estimator` in {"unstandardized", "standardized"}
+# Then, running the program will produce a pop-up window 
+# containing the estimated VE surface plot.  
+# This requires manual tweaking to get the angle(s) such that everything is visible
+#
 rm(list=ls())
 cat("\014")
 library("tidyverse")
@@ -9,37 +15,65 @@ library("plotly")
 library("tidyquant")
 library("reshape2")
 library("mgcv")
+
+# User-provided arg to the program
+estimator   <- "unstandardized"
+
+# input/output directories
+topLevelIn  <- "data/"
+topLevelOut <- "resTable/"
+
+outTableDir <- paste0(topLevelOut, estimator, "/")
+
+numTimePts  <- readRDS(file = paste0(topLevelIn, "numTimePts.rds"))
+numTrials   <- readRDS(file = paste0(topLevelIn, "numTrials.rds"))
+
+tau         <- numTimePts - 1
+J           <- numTrials  - 1
+# end boilerplate
 ##----------------------------------------------------------------
 ##   Helper functions
 ##----------------------------------------------------------------
-coarsePlot      <- function(resDir, numTrials, numTimes){
+coarsePlot      <- function(resDir, numTrials, numTimes, analysis=estimator){
   
-  pFit          <- readRDS(file = paste0(resDir, "pFit_pooled.rds"))
-  cFit          <- readRDS(file = paste0(resDir, "cFit_pooled.rds"))
-  oFit          <- readRDS(file = paste0(resDir, "oFit_calTime.rds"))
+  if (analysis=="unstandardized"){
+    estCode <- "unstd"   
+  } else if (analysis=="standardized"){
+    estCode <- "std"   
+  }
+  dFit          <- readRDS(file = paste0(resDir, 'dFit.rds'))
+  hFit          <- readRDS(file = paste0(resDir, 'hFit.rds'))
+  oFit          <- readRDS(file = paste0(resDir, analysis, "/", "oFit_", analysis, ".rds"))
+
+  initD         <- list( coef(dFit) ) 
+  initH         <- list( coef(hFit) ) 
+  initO         <- list( coef(oFit) ) 
   
-  modelParms    <- length(pFit) + length(cFit) + length(oFit)
-  
+  numNuisModelParms <- length(initD[[1]]) + length(initH[[1]]) + length(initO[[1]])
+
   resList       <- vector(mode  = "list",  length = 3)
   resMatVE      <- matrix(nrow  = numTrials, ncol = numTimes)
   resMatCIlow   <- matrix(nrow  = numTrials, ncol = numTimes)
   resMatCIhi    <- matrix(nrow  = numTrials, ncol = numTimes)
-  for (j in c(0:(numTrials-1))){
-    logRRpoint  <- readRDS(file = paste0(resDir, "deliEstAnalysis", j, ".rds"))
-    logRRCI     <- readRDS(file = paste0(resDir, "deliCIAnalysis",  j, ".rds"))
-  
+  for ( j in c(0:J) ){
+    logRRpoint  <- readRDS(file = paste0(resDir, analysis, "/", "deliEstAnalysis_", estCode, j, ".rds"))
+    logRRCI     <- readRDS(file = paste0(resDir, analysis, "/", "deliCIanalysis_",  estCode, j, ".rds"))
+    
+    if (analysis=="unstandardized"){
+      startIndex  <- numNuisModelParms + 1
+    } else if (analysis=="standardized"){
+      startIndex  <- numNuisModelParms + (2*(tau-j)) + 1 # includes risk parm vectors under a=0, 1. 
+    }
     totalParams <- length(logRRpoint)
 
-    logRRpoint  <- logRRpoint[(modelParms+1):(totalParams)]
-    
-    logRRCI     <- logRRCI[(modelParms+1):(totalParams),]
+    logRRpoint  <- logRRpoint[startIndex:totalParams]
+    logRRCI     <- logRRCI[startIndex:totalParams,]
     
     VE          <- 1-exp(logRRpoint) # convert from logRR to VE 
-    
+  
     VECI        <- 1-exp(logRRCI)    # convert from logRR to VE confidence limits
     CIout       <- VECI[, rev(seq_len(ncol(VECI)))] # reverse cols so confidence lims are lower, upper
-    numTimePts  <- length(logRRpoint)
-    k           <- c(1:numTimePts)
+    k           <- c( 1:length(logRRpoint) )
     
     resMatVE[j+1, k]    <- VE
     resMatCIlow[j+1, k] <- CIout[,1]
@@ -51,7 +85,6 @@ coarsePlot      <- function(resDir, numTrials, numTimes){
   resList[[3]]  <- resMatCIhi
   return(resList)
 }
-
 getResTable <- function(VEres, trials, times){
   resTable  <- matrix(nrow = length(times), 
                       ncol = length(trials)+1)
@@ -78,7 +111,7 @@ getResTable <- function(VEres, trials, times){
 ##----------------------------------------------------------------
 ##   Prepare axis labels for 3-d contour plots
 ##----------------------------------------------------------------
-yAxisLabs <- seq.Date( dmy("15/2/2021"), length=12, by='1 week' )
+yAxisLabs <- seq.Date( dmy("15/2/2021"), length=numTrials, by='1 week' )
 yAxisLabs <- str_replace_all(yAxisLabs, "2021-", "")
 
 yAxisLabs <- seq(ymd("2021-02-15"), ymd("2021-05-03"), by = "7 days")
@@ -112,36 +145,39 @@ axy <- list(title = list(text="Calendar Date of Vaccination"),
             tickvals = seq(1,111, by=10),
             ticketmode = "array", 
             range = c(1,119)
-            , standoff=20
+            , standoff=40
             )
-
 ##----------------------------------------------------------------
 ##   Process results
 ##----------------------------------------------------------------
-dirCD_12_s4  <- "C:/Users/Justin/OneDrive - University of North Carolina at Chapel Hill/Documents/UNCspring2024/VEapplication/data/"
-VE_CD        <- coarsePlot(dirCD_12_s4, 12, 44)
+VE   <- coarsePlot(topLevelIn, numTrials, tau)
 
 # point estimate and confidence interval for VE_0(44) for use in discussion
-VE_CD[[1]][1,44]          
-VE_CD[[2]][1,44]          
-VE_CD[[3]][1,44]          
+VE[[1]][1,44]
+VE[[2]][1,44]
+VE[[3]][1,44]
 
+##----------------------------------------------------------------
+##  manually smooth the discrete VE point ests/CIs
+##----------------------------------------------------------------
+# manually do the smoothing on a fine-enough scale so that the 'sawtooth' edge
+# of the estimated VE surface is barely noticable in the final image
 jSeq <- 1:120
 kSeq <- 1:440
 
-coarseMelted_CD <- vector(mode="list", length = 3)
-predicted_CD    <- vector(mode="list", length = 3)
-gamMod_CD       <- vector(mode="list", length = 3)
-plot_CD         <- vector(mode="list", length = 3)
+coarseMelted <- vector(mode="list", length = 3)
+predicted    <- vector(mode="list", length = 3)
+gamMod       <- vector(mode="list", length = 3)
+plot         <- vector(mode="list", length = 3)
 
 for (p in 1:3){
-  coarseMelted_CD[[p]] <- melt(VE_CD[[p]]) %>% rename(jPlus1 = Var1) %>%
+  coarseMelted[[p]] <- melt(VE[[p]]) %>% rename(jPlus1 = Var1) %>%
     rename(k = Var2) %>%
     rename(z = value)
 
-  gamMod_CD[[p]] <- gam(z ~ te(jPlus1) + te(k) + ti(jPlus1, k), data=coarseMelted_CD[[p]])
+  gamMod[[p]] <- gam(z ~ te(jPlus1) + te(k) + ti(jPlus1, k), data=coarseMelted[[p]])
 
-  predicted_CD[[p]]                     <- matrix(data=NA, nrow=120, ncol=440)
+  predicted[[p]]                     <- matrix(data=NA, nrow=120, ncol=440)
   jIndex                                <- 0
   for (j in seq(1, 12.9, by = 0.1) ){
     jIndex                              <- jIndex + 1
@@ -149,36 +185,38 @@ for (p in 1:3){
     for (k in seq(1, (44-j), by = 0.1) ){
       kIndex                            <- kIndex + 1
       newdat                            <- data.frame(jPlus1=j, k=k)
-      predicted_CD[[p]][jIndex, kIndex] <- predict(gamMod_CD[[p]], newdata=newdat)
+      predicted[[p]][jIndex, kIndex] <- predict(gamMod[[p]], newdata=newdat)
     }
   }
-  plot_CD[[p]] <- cbind(rep(NA, 120), predicted_CD[[p]])
+  plot[[p]] <- cbind(rep(NA, 120), predicted[[p]])
 }
-
-axz <- list(title = "Vaccine Effectiveness", autotick = F,  
-            tickvals=c(-1,-.8, -.6,-.4, -.2, 0, .2, .4, .6, .8, 1), 
+##----------------------------------------------------------------
+##   3-d contour plots
+##----------------------------------------------------------------
+axz <- list(title = "Vaccine Effectiveness", autotick = F,
+            tickvals=c(-1,-.8, -.6,-.4, -.2, 0, .2, .4, .6, .8, 1),
             range = c(-1.2,1))
-# 3d contour plots
-fig_CD <- plot_ly()
-fig_CD <- fig_CD %>% add_surface(z = ~plot_CD[[2]], opacity=.25, showscale=FALSE, cmin = -.6,cmax = 1)
-fig_CD <- fig_CD %>% add_surface(z = ~plot_CD[[3]], opacity=.25, showscale=FALSE, cmin = -.6,cmax = 1)
-fig_CD <- fig_CD %>% add_surface(z = ~plot_CD[[1]], opacity=1,
-                                 
-                           showscale=FALSE,
-                           # colorbar=list(title='VE', y=.89, x=.7),
-                           
+
+fig <- plot_ly()
+fig <- fig %>% add_surface(z = ~plot[[2]], opacity=.25, showscale=FALSE, cmin = -.6,cmax = 1)
+fig <- fig %>% add_surface(z = ~plot[[3]], opacity=.25, showscale=FALSE, cmin = -.6,cmax = 1)
+fig <- fig %>% add_surface(z = ~plot[[1]], opacity=1,
+                           showscale=TRUE,
+                           colorbar=list(title='VE', y=.89, x=.7),
                            cmin = -.6,
                            cmax = 1
                            )
-fig_CD <- fig_CD %>% layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz))
-fig_CD
-
+fig <- fig %>% layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz), font=list(size=13))
+fig
 ##----------------------------------------------------------------
 ##   Create output table for point est and 95% CI.
 ##----------------------------------------------------------------
-outTableDir <- "C:/Users/Justin/OneDrive - University of North Carolina at Chapel Hill/Documents/VEapplication/resTable/"
-resTable_CD <- getResTable(VE_CD,
+resTable <- getResTable( VE,
   trials = c(0, 3, 6,  9),
-  times  = c(1, 7, 14, 21, 28, 34))
-
-print(xtable::xtable(resTable_CD), file=paste0(outTableDir, "table.txt"))
+  times  = c(1, 7, 14, 21, 28, 34)
+)
+if (estimator=="unstandardized"){
+  print(xtable::xtable(resTable), file=paste0(outTableDir, "table_un.txt"))  
+} else{
+  print(xtable::xtable(resTable), file=paste0(outTableDir, "table_st.txt"))  
+}

@@ -1,10 +1,11 @@
-This repository contains scripts for the simulation study and data analysis in the manuscript "Assessing COVID-19 vaccine effectiveness in observational studies via nested trial emulation" by DeMonte et al.
+This repository contains scripts for the simulation study and data analysis in the manuscript "Assessing vaccine effectiveness in observational studies via nested trial emulation" by DeMonte et al.  <link: https://arxiv.org/abs/2403.18115>
 
-Simulations were conducted in R and Python on the longleaf High Performance Computing Cluster at UNC-Chapel Hill.  The shell scripts in this repository are used to specify global parameters and submit jobs to the Slurm Workload Manager.  To replicate the simulations, all files under ```sims```, including shell scripts, R and Python scripts, should be placed in the same directory.  The following instructions assume that this directory is ```[user directory]/sims/```.
+Simulations were conducted in R and Python on on a SLURM-managed High Performance Computing (HPC) cluster, and the shell scripts used are specific to SLURM.  
 
-Before beginning, users need to create a python virtual environment, ensure that the needed R packages are installed, and create a directory structure according to the following 4 steps. 
-
-Step 1: create python virtual environment by running the following commands:
+The following steps can be used to reproduce the simulation results.  All files in the gitHub repository should be placed under the same user directory.  For example, if the user directory is titled 'userDirectory', then the top level of that directory must contain the following:
+userDirectory/sims
+userDirectory/virtualEnv
+Users can create a python virtual environment by running the following commands:
 
 ```
 module add anaconda/2023.03
@@ -17,49 +18,18 @@ python3.10 -m pip install --upgrade 'delicatessen'
 python3.10 -m pip install --upgrade 'pandas'
 ```
 
-Step 2: ensure necessary R packages are installed.
-This can be done via an interactive R prompt using ```install.packages()```.  The following packages are required:
+Each .sh shell script performs a set of simulations under certain parameters.  The following naming convention is used for the shell scripts.  The first letter is 'm' for the "main" simulations (described in Section 3 of the main text and Section S2 of the supplementary materials) or 'e' for "extension" simulations (described in Section 4.3 of the main text and Section S4 of the supplementary materials); the second letter is 'n' for the "naive" or comparator analysis or 'p' for the "proposed" analysis; the third letter is 's' for "splines" or 'p' for "polynomials", specifying the functional form of time used in the analysis models; the number refers to the scenario.  For example, running the shell file sim_enp1.sh will reproduce results in the "Unstandardized" columns and "Scenario 1" rows of Table S3 in the supplemental materials (extension methods, naive analysis, using polynomial functions of time, scenario 1).  Scripts truM.sh and truE.sh are used to approximate the true parameter values for scenarios 1-3 of the "main" and "extension" simulations, respectively.  
 
-```simEstVE_xxxx.R``` requires the packages ```rms, dplyr, tibble, tidyr, purrr,``` and ```reticulate```.
+The shell scripts for reproducing the simulations must be run from the working directory userDirectory/sims.  Note that 'userDirectory/sims' contains several empty subdirectories.  Running the shell scripts will populate these subdirectories with results files.  Once all .sh files have run successfully, the R program 204gather.R can be run (from the working directory userDirectory/sims) to produce LaTeX code which in turn can be run to reproduce results tables S1-S3 in the supplemental materials.  The directory 'virtualEnv' contains the python virtual environment containing the python version and all dependencies under which the results in the manuscript were generated.  The required R version and dependencies are as follows:
 
-```simGather.R``` requires the package ```tidyverse```.
+R version 4.4.0
+tidyverse v2.0
+matrixStats v1.5.0
+reticulate v1.43.0
+VGAM v1.1-13
+Hmisc v5.2-3
+xtable v1.8-4
 
-Step 3: edit shell scripts (where applicable).
-If the following line appears near the top of the shell script, change the directory to match the one specified in Step 1:
-I.e., change
-```source /nas/longleaf/home/demjus01/virtualEnv/bin/activate```
-to 
-```source [user directory]/virtualEnv/bin/activate```
+The directory 'VEapplication' contains scripts used to produce the applied data analysis results in the manuscript.  These scripts depend on the Abruzzo COVID-19 dataset, which is the property of Dr. Lamberto Manzoli and colleagues and cannot be shared publicly.  These data were used under Dr. Manzoli's written permission.  
 
-Step 4: create directory structure for simulation results.
-The R scripts create output for each replication of the simulation.  The output is stored in a series of subdirectories below the directory which contains all the scripts.  Please create the following (empty) directory structure:
-
-```
-[user directory]/sims/results/spline/scenario1/results
-[user directory]/sims/results/spline/scenario2/results
-[user directory]/sims/results/spline/scenario3/results
-
-[user directory]/sims/results/poly/scenario1/proposed/results
-[user directory]/sims/results/poly/scenario1/naive/results
-[user directory]/sims/results/poly/scenario2/proposed/results
-[user directory]/sims/results/poly/scenario2/naive/results
-[user directory]/sims/results/poly/scenario3/proposed/results
-[user directory]/sims/results/poly/scenario3/naive/results
-```
-
-There are three R scripts and one Python script for running the simulations. 
-
-```00_balancing_numerical_solver_source_code.R``` was adapted from https://github.com/serobertson/BalancingInterceptSolver.  This script is used to calculate the "balancing intercept" for the true logit model for the outcome hazard.
-
-```simGenerate.R``` generates a simulated dataset according to the data generating process described in the manuscript. 
-
-```simEstVE_xxxx.R``` calculates point estimates for the simulated dataset created by ```simGenerate.R``` and generates output files.  There are two versions of this script: one for the simulations appearing in the main text of the manuscript ('poly') and one for the simulations appearing in the supplemental materials ('spline').
-
-```simEstVar_xxxx.py``` calculates variance estimates.  Similarly to ```simEstVE_xxxx.R```, there are two versions: 'poly' and 'spline'. 
-
-To replicate the simulations, the user calls the script ```simRun.sh```.  Once all simulations are completed, running the script ```simGather.R``` will generate LaTeX format tables of the results which appear in the manuscript (main text and supplement).
-	
-The script ```LexisDiagram/LexisDiagram.R``` generates Figure 1 in the manuscript.  This small script can be run on any R setup assuming that the necessary packages (```tidyverse``` and ```patchwork```) are installed.  Scripts used to analyze the Abruzzo data are contained in ```VEapplication```.  The analysis was carried out using R and Python on the longleaf High Performance Computing Cluster at UNC-Chapel Hill.  These scripts depend on the Abruzzo COVID-19 dataset, which is the property of Dr. Lamberto Manzoli and colleagues and was used under Dr. Manzoli's written permission.  
-
-Users are encouraged to submit any issues.  For other questions, please email demjus01@live.unc.edu.
-
+For any questions, please email demjus01@live.unc.edu.
