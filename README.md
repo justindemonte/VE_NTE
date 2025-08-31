@@ -1,4 +1,4 @@
-This repository contains scripts for the simulation study and data analysis in the manuscript "Assessing vaccine effectiveness in observational studies via nested trial emulation" by DeMonte et al.  <link: https://arxiv.org/abs/2403.18115>
+This repository contains scripts for the simulation study and data analysis in the manuscript "Assessing vaccine effectiveness in observational studies via nested trial emulation" by [DeMonte et al.]([https://pages.github.com/](https://arxiv.org/abs/2403.18115))
 
 Simulations were conducted in R and Python on on a SLURM-managed High Performance Computing (HPC) cluster, and the shell scripts used are specific to SLURM.  
 
