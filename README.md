@@ -23,11 +23,17 @@ Each .sh shell script performs a set of simulations under certain parameters.  T
 The shell scripts for reproducing the simulations must be run from the working directory userDirectory/sims.  Note that 'userDirectory/sims' contains several empty subdirectories.  Running the shell scripts will populate these subdirectories with results files.  Once all .sh files have run successfully, the R program 204gather.R can be run (from the working directory userDirectory/sims) to produce LaTeX code which in turn can be run to reproduce results tables S1-S3 in the supplemental materials.  The directory 'virtualEnv' contains the python virtual environment containing the python version and all dependencies under which the results in the manuscript were generated.  The required R version and dependencies are as follows:
 
 R version 4.4.0
+
 tidyverse v2.0
+
 matrixStats v1.5.0
+
 reticulate v1.43.0
+
 VGAM v1.1-13
+
 Hmisc v5.2-3
+
 xtable v1.8-4
 
 The directory 'VEapplication' contains scripts used to produce the applied data analysis results in the manuscript.  These scripts depend on the Abruzzo COVID-19 dataset, which is the property of Dr. Lamberto Manzoli and colleagues and cannot be shared publicly.  These data were used under Dr. Manzoli's written permission.  
