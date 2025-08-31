@@ -3,8 +3,11 @@ This repository contains scripts for the simulation study and data analysis in t
 Simulations were conducted in R and Python on on a SLURM-managed High Performance Computing (HPC) cluster, and the shell scripts used are specific to SLURM.  
 
 The following steps can be used to reproduce the simulation results.  All files in the gitHub repository should be placed under the same user directory.  For example, if the user directory is titled 'userDirectory', then the top level of that directory must contain the following:
+
 userDirectory/sims
+
 userDirectory/virtualEnv
+
 Users can create a python virtual environment by running the following commands:
 
 ```
